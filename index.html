@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<center>
+<h1>Ticket Booking</h1>
+From : <select id="from" name="from"></select>
+To : <select id="to" name="to"></select><button id="poptrain" onclick="populateTrains()">search</button><br><br>
+Train : <select id="train" name="train"></select><br><br>
+Class : <select id="class" name="class"></select>
+Date : <input type="date" name="datee"/>
+</center>
+</body>
+<table>
+<tr>
+<th>
+</th>
+</tr>
+</table>
+<script>
+var xhr = new XMLHttpRequest();
+
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+        var data = JSON.parse(xhr.responseText);
+        var fromSelect = document.getElementById("from");
+        var toSelect = document.getElementById("to");
+
+        fromSelect.innerHTML = "";
+        toSelect.innerHTML = "";
+
+        var uniqueFromStations = [];
+        var uniqueToStations = [];
+
+        for (var i = 0; i < data.length; i++) {
+            var stationName = data[i].sname.trim();
+            if (!uniqueFromStations.includes(stationName)) {
+                uniqueFromStations.push(stationName);
+            }
+            if (!uniqueToStations.includes(stationName)) {
+                uniqueToStations.push(stationName);
+            }
+        }
+
+        for (var j = 0; j < uniqueFromStations.length; j++) {
+            var station = uniqueFromStations[j];
+            var option = document.createElement("option");
+            option.value = station;
+            option.textContent = station;
+            fromSelect.appendChild(option);
+        }
+
+        for (var k = 0; k < uniqueToStations.length; k++) {
+            var station = uniqueToStations[k];
+            var option = document.createElement("option");
+            option.value = station;
+            option.textContent = station;
+            toSelect.appendChild(option);
+        }
+    }
+};
+
+xhr.open("GET", "http://localhost:8080/RailNew/Stationservlet", true);
+xhr.send();
+
+function populateTrains() {
+    var from = document.getElementById("from");
+    var to = document.getElementById("to");
+    var fromstat = from.value;
+    var tostat = to.value;
+
+    var xhr2 = new XMLHttpRequest();
+
+    xhr2.onreadystatechange = function () {
+        if (xhr2.readyState === 4 && xhr2.status === 200) {
+        	console.log(xhr2.responseText);
+        	
+            var data = JSON.parse(xhr2.responseText);
+            var trainSelect = document.getElementById("train");
+			
+          
+            
+
+            var uniqueTrainStations = [];
+
+            for (var i = 0; i < data.length; i++) {
+                var stationName = data[i].trainName.trim();
+                if (!uniqueTrainStations.includes(stationName)) {
+                    uniqueTrainStations.push(stationName);
+                }
+            }
+
+            for (var j = 0; j < uniqueTrainStations.length; j++) {
+                var station = uniqueTrainStations[j];
+                var option = document.createElement("option");
+                option.value = station;
+                option.textContent = station;
+                trainSelect.appendChild(option);
+            }
+        }
+    };
+
+    xhr2.open("GET", `http://localhost:8080/RailNew/TrainServlet?from=${fromstat}&to=${tostat}`, true);
+    xhr2.send();
+}
+
+
+
+
+
+</script>
+
+</html>
